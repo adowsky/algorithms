@@ -1,14 +1,11 @@
 package algorithm.graphs.representation;
 
-/**
- * Created by ado on 09.01.16.
- */
-public class WeightenedIncidenceMatrix<T> {
+public class WeightedIncidenceMatrix<T> {
 
     private T[] vertices;
     private float[][] matrix;
 
-    public WeightenedIncidenceMatrix(T[] vertices) {
+    public WeightedIncidenceMatrix(T[] vertices) {
         this.vertices = vertices.clone();
         matrix = new float[vertices.length][vertices.length];
         clearConnections();

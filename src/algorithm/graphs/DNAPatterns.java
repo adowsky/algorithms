@@ -2,7 +2,7 @@ package algorithm.graphs;
 
 
 import algorithm.graphs.heuristics.MarkovClustering;
-import algorithm.graphs.representation.WeightenedIncidenceMatrix;
+import algorithm.graphs.representation.WeightedIncidenceMatrix;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -11,7 +11,7 @@ import java.util.LinkedList;
  * Reads DNA sequences from file and creates graph with subseqences.
  */
 public class DNAPatterns {
-    private WeightenedIncidenceMatrix<DNANode> graph;
+    private WeightedIncidenceMatrix<DNANode> graph;
     private int hamm;
     private int instancesNumber;
     private int nodeLength;
@@ -55,7 +55,7 @@ public class DNAPatterns {
                     nodes[iter++] = n;
                 }
             }
-            graph = new WeightenedIncidenceMatrix<>(nodes);
+            graph = new WeightedIncidenceMatrix<>(nodes);
 
         }catch(IOException ex){
             ex.printStackTrace();
@@ -70,9 +70,9 @@ public class DNAPatterns {
                 if (i != j && node.getInstNo()!=graph.getVertex(j).getInstNo() && node.isSimiliarTo(graph.getVertex(j)) ){
                     int k = node.hamming(graph.getVertex(j));
                     if(k <= hamm){
-                        k = 10*(node.length - k);
+                        k = 10*(node.getLength() - k);
                     }else {
-                        k = node.length - k;
+                        k = node.getLength() - k;
                     }
                     graph.setConnection(i,j,k);
                     graph.setConnection(j,i,k);
@@ -97,22 +97,22 @@ public class DNAPatterns {
                     continue;
                 for(int index : clique){
                     DNANode vertex = graph.getVertex(index);
-                    if(tmp[vertex.instNo -1 ].size() > 0) {
+                    if(tmp[vertex.getInstNo() -1 ].size() > 0) {
                         DNANode last = tmp[vertex.getInstNo() - 1].getLast();
                         if (vertex.getPos() - last.getPos() < vertex.getLength() && vertex.getPos() - last.getPos() >0) {
-                            tmp[vertex.instNo - 1].addLast(vertex);
+                            tmp[vertex.getInstNo() - 1].addLast(vertex);
                             String str = vertex.getSeq().substring(vertex.getLength() -(vertex.getPos() - last.getPos()));
-                            values[vertex.instNo - 1].append(str);
+                            values[vertex.getInstNo() - 1].append(str);
                         } else {
                             if (resultVal == null) {
-                                resultVal = values[vertex.instNo - 1];
+                                resultVal = values[vertex.getInstNo() - 1];
                             }
-                            values[vertex.instNo - 1] = new StringBuilder();
-                            tmp[vertex.instNo - 1] = new LinkedList<>();
-                            tmp[vertex.instNo - 1].addLast(vertex);
+                            values[vertex.getInstNo() - 1] = new StringBuilder();
+                            tmp[vertex.getInstNo() - 1] = new LinkedList<>();
+                            tmp[vertex.getInstNo() - 1].addLast(vertex);
                         }
                     }else
-                        tmp[vertex.instNo -1 ].addLast(vertex);
+                        tmp[vertex.getInstNo() -1 ].addLast(vertex);
                 }
         }
         System.out.println("Best Theme: "+resultVal.toString());
@@ -130,148 +130,4 @@ public class DNAPatterns {
         pt.findResult(mc.execute(),mc.getCliquesSize());
 
     }
-}
-class DNANode{
-    int length;
-    String seq;
-    int instNo;
-    int pos;
-
-    public DNANode(int l, String seq, int instNo, int pos ){
-        length = l;
-        this.pos = pos;
-        if(seq.length() != length)
-            System.out.println("Length Error!");
-        this.seq = seq;
-        this.instNo = instNo;
-    }
-
-    public int getPos() {
-        return pos;
-    }
-
-    public int getLength() {
-        return length;
-    }
-
-    public String getSeq() {
-        return seq;
-    }
-
-    public int getInstNo() {
-        return instNo;
-    }
-
-    @Override
-    public boolean equals(Object o){
-        //TODO need to be improved
-       return ((DNANode)o).getSeq().equals(seq);
-    }
-    public boolean isSimiliarTo(DNANode o){
-        int k=0;
-        for(int i=0;i<length;i++){
-            if(seq.charAt(i) != o.seq.charAt(i))
-                k++;
-        }
-        if(k>2)
-            return false;
-        else
-            return true;
-    }
-    public int hamming(DNANode o){
-        int r = 0;
-        for(int i=0;i<length;++i){
-            if(seq.charAt(i) != o.getSeq().charAt(i))
-                r++;
-        }
-        return r;
-    }
-}
-class ResultStruct{
-    private DNANode[] sq;
-    private int[][] conns;
-    private int size;
-    private int[] vertices;
-
-    public int[] getVertices() {
-        return vertices;
-    }
-
-    public void setVertices(int[] vertices) {
-        this.vertices = vertices;
-    }
-
-    public DNANode[] getSq() {
-        return sq;
-    }
-
-    public ResultStruct setSq(DNANode[] sq) {
-        this.sq = sq;
-        return this;
-    }
-
-    public int[][] getConns() {
-        return conns;
-    }
-
-    public ResultStruct setConns(int[][] conns) {
-        this.conns = conns;
-        return this;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public ResultStruct setSize(int size) {
-        this.size = size;
-        return this;
-    }
-}
-class LongestPathFinder{
-    private int[][] graph;
-    public  LongestPathFinder(int[][] graph){
-        this.graph = graph;
-    }
-    public int[] getLongestPath(){
-        int[] result = new int[graph.length];
-        int[] tmp = new int[graph.length];
-        int iterator = 0;
-        boolean wasNext = true;
-        int bestValue = 0;
-        int value = 0;
-        //do we need to check start from each vertex?
-        for(int k =0; k<graph.length;++k) {
-            tmp[iterator++] = k;
-            do {
-                int v = tmp[iterator - 1];
-                int start = 0;
-                if (!wasNext) {
-                    start = tmp[iterator];
-                    tmp[iterator] = -1;
-                }
-                wasNext = false;
-                for (int i = start; i < graph.length; ++i) {
-                    if (graph[v][i] > 0) {
-                        value += graph[v][i];
-                        tmp[iterator++] = i;
-                        wasNext = true;
-                        break;
-                    }
-                }
-                if(!wasNext){
-                    if(value> bestValue){
-                        for(int i=0;i<graph.length;++i){
-                            result[i] = tmp[i];
-                            bestValue = value;
-                        }
-                    }
-                    iterator--;
-                }
-
-            } while (iterator>0);
-        }
-        return result;
-    }
-
 }

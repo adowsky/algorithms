@@ -1,5 +1,8 @@
 package algorithm.graphs.heuristics;
 
+/**
+ * Implementation of Markov clustering algorithm.
+ */
 public class MarkovClustering {
     private int power;
     private double inflation;
@@ -33,6 +36,11 @@ public class MarkovClustering {
             for(int j=0;j<graph.length;++j)
                 this.graph[i][j] = graph[i][j];
     }
+
+    /**
+     * Runs algorithm
+     * @return array with result sets. Some of result can by empty.
+     */
     public int[][] execute(){
         if(devel)
             System.out.print("Preparing matrix...");
@@ -181,6 +189,10 @@ public class MarkovClustering {
         return result;
     }
 
+    /**
+     * Returns amount of cliques found in graph
+     * @return amount of cliques found in graph
+     */
     public int getCliquesSize() {
         return cliquesCount;
     }
